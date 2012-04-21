@@ -17,8 +17,7 @@ class Webfinger extends CI_Controller {
         $doc->openMemory();
         $doc->startDocument('1.0','UTF-8');
 
-        $doc->startElement('XRD');
-        $doc->writeAttribute('xmlns', 'http://docs.oasis-open.org/ns/xri/xrd-1.0');
+        $doc->startElementNS(NULL, 'XRD', 'http://docs.oasis-open.org/ns/xri/xrd-1.0');
 
         $doc->writeElement('Subject', 'acct:alex@xeen.co.uk');
         $doc->writeElement('Link', NULL, array(
