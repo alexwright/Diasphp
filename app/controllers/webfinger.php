@@ -8,6 +8,25 @@ class Webfinger extends CI_Controller {
 
     public function finger ()
     {
+        $uri = $this->input->get('uri', TRUE);
+        if ($uri === FALSE)
+        {
+            $this->output->set_status_header(400);
+            return;
+        }
+        if (substr($uri, 0, 5) === 'acct:')
+        {
+            $uri = substr($uri, 5);
+        }
+
+        $this->load->model('profile_model');
+        $profile = $this->profile_model->find_by_email($uri);
+        if ($profile === FALSE)
+        {
+            $this->output->set_status_header(404);
+            return;
+        }
+
         $this->output->set_header('Content-Type: application/xml; charset=utf-8');
         $this->load->helper('url');
 
@@ -19,36 +38,36 @@ class Webfinger extends CI_Controller {
 
         $doc->startElementNS(NULL, 'XRD', 'http://docs.oasis-open.org/ns/xri/xrd-1.0');
 
-        $doc->writeElement('Subject', 'acct:alex@xeen.co.uk');
+        $doc->writeElement('Subject', 'acct:' . "{$profile->local}@{$profile->domain}");
         $doc->writeElement('Link', NULL, array(
                 'rel'   => 'http://microformats.org/profile/hcard',
                 'type'  => 'text/html',
-                'href'  => site_url('hcard/users/4d0b3cf12c17436c790029d1'),
+                'href'  => site_url("hcard/users/{$profile->guid}"),
             ));
         $doc->writeElement('Link', NULL, array(
                 'rel'   => 'http://joindiaspora.com/seed_location',
                 'type'  => 'text/html',
-                'href'  => 'https://joindiaspora.com/',
+                'href'  => site_url(),
             ));
         $doc->writeElement('Link', NULL, array(
                 'rel'   => 'http://joindiaspora.com/guid',
                 'type'  => 'text/html',
-                'href'  => '4d0b3cf12c17436c790029d1',
+                'href'  => $profile->guid,
             ));
         $doc->writeElement('Link', NULL, array(
                 'rel'   => 'http://webfinger.net/rel/profile-page',
                 'type'  => 'text/html',
-                'href'  => 'https://joindiaspora.com/u/alexw',
+                'href'  => "https://joindiaspora.com/u/{$profile->guid}",
             ));
         $doc->writeElement('Link', NULL, array(
                 'rel'   => 'http://schemas.google.com/g/2010#updates-from',
                 'type'  => 'application/atom+xml',
-                'href'  => 'https://joindiaspora.com/public/alexw.atom',
+                'href'  => site_url("activity_stream/public/{$profile->guid}"),
             ));
         $doc->writeElement('Link', NULL, array(
                 'rel'   => 'diaspora-public-key',
                 'type'  => 'RSA',
-                'href'  => 'Bhagh',
+                'href'  => base64_encode($profile->public_key),
             ));
 
         $doc->endElement();
