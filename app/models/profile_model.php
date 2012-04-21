@@ -1,6 +1,9 @@
 <?php
 class Profile_model extends MY_Model {
-    private $table_name = 'profile';
+    public function __construct ()
+    {
+        parent::__construct();
+    }
 
     public function find_by_id ($id)
     {
@@ -16,22 +19,6 @@ class Profile_model extends MY_Model {
             'local'     => $local,
             'domain'    => $domain,
         )));
-    }
-
-    private function get_where ($where)
-    {
-        return $this->db->get_where(
-            $this->table_name,
-            $where);
-    }
-
-    private function row_or_false ($query_ref)
-    {
-        if ($query_ref->num_rows() == 0)
-        {
-            return FALSE;
-        }
-        return $query_ref->row();
     }
 }
 
