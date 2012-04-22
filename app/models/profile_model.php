@@ -20,5 +20,12 @@ class Profile_model extends MY_Model {
             'domain'    => $domain,
         )));
     }
+
+    public function find_by_guid ($guid)
+    {
+        return $this->row_or_false($this->get_where(array(
+            'guid'      => $guid,
+        )));
+    }
 }
 
