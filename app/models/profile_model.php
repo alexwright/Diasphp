@@ -27,5 +27,80 @@ class Profile_model extends MY_Model {
             'guid'      => $guid,
         )));
     }
+
+    public function set_keys ($profile_id, $private_key, $public_key)
+    {
+        $this->update(
+            array(
+                'private_key'   => $private_key,
+                'public_key'    => $public_key,
+            ),
+            array(
+                'id'            => $profile_id,
+            )
+        );
+    }
+
+    public function save_remote_profile ($profile)
+    {
+        $key = $this->normalize_key($profile->public_key);
+
+        $subject = $profile->subject;
+        if (substr($subject, 0, 5) == 'acct:')
+        {
+            $subject = substr($subject, 5);
+        }
+        $subject = explode('@', $subject, 2);
+
+        $row = array(
+            'type'              => 'remote',
+            'guid'              => $profile->guid,
+            'local'             => $subject[0],
+            'domain'            => $subject[1],
+            'public_key'        => $key,
+            'forename'          => $profile->hcard->forename,
+            'surname'           => $profile->hcard->surname,
+            'searchable'        => $profile->hcard->searchable,
+        );
+
+        
+        $id = $this->insert($row);
+
+        $this->load->model('remote_profile_model');
+        $this->remote_profile_model->create(
+            $id,
+            $profile->seed_location,
+            NULL
+        );
+
+        return $id;
+    }
+
+    private function normalize_key ($key)
+    {
+        // Strip armor
+        $in = preg_replace('/-{5}[A-Z\s]+-{5}|\s|\n|\r/', '', $key);
+
+        include_once 'ASN/ASN.php';
+        $s = ASN::decode(base64_decode($in));
+        if (ASN::is_pkcs1($s))
+        {
+            // Extract modulus and exponent, and format as x509
+            $m = $s[0]->value[0];
+            $e = $s[0]->value[1];
+            $s = ASN::pkcs_to_x509($m, $e);
+            
+            // Re-armor
+            $out = base64_encode(ASN::encode($s));
+            $out = implode("\n", str_split($out, 64));
+            $out = implode("\n", array(
+                '-----BEGIN PUBLIC KEY-----',
+                $out,
+                '-----END PUBLIC KEY-----',
+            ));
+            return $out;
+        }
+        return $key;
+    }
 }
 
