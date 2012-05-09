@@ -1,7 +1,6 @@
 <?php
 
 class Receive extends CI_Controller {
-    // !curl -id @request_xml.dump http://dev.diasphp.com/receive/users/0123456789ABCDEF
     public function users ($guid)
     {
         $this->load->model('profile_model');
@@ -33,6 +32,33 @@ class Receive extends CI_Controller {
 
         var_dump($env, $decrypted_header, $decrypted_data);
         $author_id = $decrypted_header['author_id'];
+    }
+
+    private function verify ($data, $sig, $public_pem = NULL, $encoding = 'base64url', $alg = 'RSA-SHA256', $type = 'application/xml')
+    {
+        $this->load->helper('base64_urlsafe');
+        $data = str_replace(array(" ","\t","\r","\n"), array("","","",""), $data);
+
+        $base_str = $data  . '.' . 
+                    base64_url_encode($type) . '.' .
+                    base64_url_encode($encoding) . '.' . 
+                    base64_url_encode($alg);
+        $my_hash = base64_encode(hash('sha256', $base_str, TRUE));
+
+        $public_key = openssl_get_publickey($public_pem);
+
+        $raw_sig = $this->base64_url_decode($sig);
+        
+        $decrypted_sig = '';
+        $r = openssl_public_decrypt($raw_sig, $decrypted_sig, $public_key);
+        if ($r !== TRUE)
+        {
+            throw new Exception('public_decrypt() failed');
+            return FALSE;
+        }
+        
+        $their_hash = base64_encode(substr($decrypted_sig, - 32));
+        return $their_hash === $my_hash;
     }
 
     private function get_env ($dom)
