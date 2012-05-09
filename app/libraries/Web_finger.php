@@ -77,18 +77,21 @@ class Web_finger {
 
     private function get_xml ($url)
     {
-        $res = $this->get($url);
+        $client = new HttpClient();
+        $res = $client->get($url);
         $dom = DOMDocument::loadXML(trim($res));
 
         return $dom;
     }
+}
 
-    private function get ($url)
+class HttpClient {
+    public function get ($url)
     {
         return $this->request('GET', $url);
     }
 
-    private function request ($method, $url)
+    public function request ($method, $url)
     {
         $c = curl_init();
         curl_setopt($c, CURLOPT_URL, $url);
@@ -122,10 +125,4 @@ class Web_finger {
     {
         throw new Exception('Curl Error: ' . $err_no);
     }
-
-    private function get_xrd ()
-    {
-        return file_get_contents('../xrd.xml');
-    }
 }
-
