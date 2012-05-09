@@ -92,6 +92,22 @@ class Receive extends CI_Controller {
         return $this->dom_to_assoc($decrypted_header);
     }
 
+    private function finger ($author_id)
+    {
+        $this->load->model('profile_model');
+        $profile = $this->profile_model->find_by_email($author_id);
+        if ($profile)
+        {
+            return $profile;
+        }
+
+        $this->load->library('web_finger');
+        $profile = $this->web_finger->finger($author_id);
+
+        $this->profile_model->save_remote_profile($profile);
+        return $profile;
+    }
+
     private function dom_to_assoc ($dom)
     {
         $a = array();
