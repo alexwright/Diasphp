@@ -40,12 +40,37 @@ class Web_finger {
         $query = '//xrd:Link[@rel="http://joindiaspora.com/guid"]/@href';
         $guid = $xpath->evaluate($query)->item(0)->value;
 
+        $query = '//xrd:Link[@rel="http://microformats.org/profile/hcard"]/@href';
+        $hcard = $xpath->evaluate($query)->item(0)->value;
+        if ( ! empty($hcard) )
+        {
+            $hcard = $this->load_hcard($hcard);
+        }
+
         $profile = array(
             'subject'   => $subject,
             'guid'      => $guid,
             'public_key'=> base64_decode($public_key),
+            'hcard'     => $hcard,
         );
         return (object)$profile;
+    }
+
+    public function load_hcard ($url)
+    {
+        $html_source = $this->request('GET', $url);
+        $html_dom = DOMDocument::loadHTML($html_source);
+        $xpath = new DOMXPath($html_dom);
+
+        $hcard = array(
+            'forename'  => 
+            $xpath->evaluate('//*[@class="given_name"]')->item(0)->nodeValue,
+            'surname'   => 
+            $xpath->evaluate('//*[@class="family_name"]')->item(0)->nodeValue,
+            'searchable'=> 
+            $xpath->evaluate('//*[@class="searchable"]')->item(0)->nodeValue == 'true',
+        );
+        return (object)$hcard;
     }
 
     private function xpath_eval_value ($xpath, $query)
