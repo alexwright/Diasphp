@@ -30,8 +30,63 @@ class Receive extends CI_Controller {
         $decrypted_header = $this->decrypt_header($dom, $profile);
         $decrypted_data = $this->decrypt_data($env, $decrypted_header);
 
-        var_dump($env, $decrypted_header, $decrypted_data);
         $author_id = $decrypted_header['author_id'];
+        $profile = $this->finger($author_id);
+        
+        $legit = $this->verify($env['data'], $env['sig'], $profile->public_key);
+        if ( ! $legit )
+        {
+            $this->output->set_status_header(404);
+            return;
+        }
+
+        $dom = $this->fix_xml($decrypted_data);
+        if ($this->handle($dom))
+        {
+            $this->output->set_status_header(200);
+            echo "ok";
+        }
+        else
+        {
+            $this->output->set_status_header(400);
+            echo "problem with message payload.";
+            return;
+        }
+    }
+
+    private function handle ($dom_payload)
+    {
+        if (
+            $dom_payload->firstChild->nodeName != 'XML'
+            ||
+            $dom_payload->firstChild->firstChild->nodeName != 'post'
+        )
+        {
+            return FALSE;
+        }
+
+        $post = $dom_payload->firstChild->firstChild;
+        foreach ($post->childNodes AS $c)
+        {
+            switch ($c->nodeName)
+            {
+                default:
+                    // unknow message type
+                    break;
+            }
+        }
+        return TRUE;
+    }
+
+    private function fix_xml ($xml)
+    {
+        $dom = new DOMDocument();
+        $dom->preserveWhiteSpace = FALSE;
+
+        $xml = str_replace(array(chr(12)), '', $xml);
+        $xml = trim($xml);
+        $dom->loadXML($xml);
+        return $dom;
     }
 
     private function verify ($data, $sig, $public_pem = NULL, $encoding = 'base64url', $alg = 'RSA-SHA256', $type = 'application/xml')
