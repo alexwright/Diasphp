@@ -40,6 +40,9 @@ class Web_finger {
         $query = '//xrd:Link[@rel="http://joindiaspora.com/guid"]/@href';
         $guid = $xpath->evaluate($query)->item(0)->value;
 
+        $query = '//xrd:Link[@rel="http://joindiaspora.com/seed_location"]/@href';
+        $seed_location = $xpath->evaluate($query)->item(0)->value;
+
         $query = '//xrd:Link[@rel="http://microformats.org/profile/hcard"]/@href';
         $hcard = $xpath->evaluate($query)->item(0)->value;
         if ( ! empty($hcard) )
@@ -51,6 +54,7 @@ class Web_finger {
             'subject'   => $subject,
             'guid'      => $guid,
             'public_key'=> base64_decode($public_key),
+            'seed_location'=> $seed_location,
             'hcard'     => $hcard,
         );
         return (object)$profile;
