@@ -1,0 +1,38 @@
+{extends file="base/base.html"}
+{block name="page_main"}
+<div class="row">
+    <form class="form-horizontal span8 offset2" method="POST" action="{'signup'|site_url}">
+        <fieldset>
+            <legend>Create Your Account</legend>
+            {foreach $form_rules AS $rule}
+                {if $rule.type eq "text" OR $rule.type eq "password"}
+                    <div class="control-group {if isset($form_errors[$rule['field']])}error{/if}">
+                        <label class="control-label" for="txt-{$rule.field}">{$rule.label}</label>
+                        <div class="controls">
+                            <input name="{$rule.field}" type="{$rule.type}" id="txt-{$rule.field}" class="input-xlarge" />
+                            {if isset($form_errors[$rule.field])}
+                                <br /><span class="help-inline">{$form_errors[$rule.field]}</span>
+                            {/if}
+                        </div>
+                    </div>
+                {/if}
+                {if $rule.type eq "checkbox"}
+                {/if}
+            {/foreach}
+            <div class="control-group">
+                <div class="controls">
+                    <label class="checkbox">
+                        <input type="checkbox" id="chk-{$rule.field}" value="yes">
+                        I totally agree to all the <a href="{'wiki/legal_stuff'|site_url}">Legal Stuff</a>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Create Account</button>
+                <a class="btn" href="{""|site_url}">Cancel</a>
+            </div>
+        </fieldset>
+    </form>
+</div>
+{/block}
