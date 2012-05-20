@@ -57,7 +57,7 @@ class Webfinger extends CI_Controller {
         $doc->writeElement('Link', NULL, array(
                 'rel'   => 'http://webfinger.net/rel/profile-page',
                 'type'  => 'text/html',
-                'href'  => "https://joindiaspora.com/u/{$profile->guid}",
+                'href'  => site_url("hcard/users/{$profile->guid}"),
             ));
         $doc->writeElement('Link', NULL, array(
                 'rel'   => 'http://schemas.google.com/g/2010#updates-from',
@@ -77,6 +77,8 @@ class Webfinger extends CI_Controller {
 
     public function host_meta ()
     {
+        //$this->output->set_header('Content-Type: application/xml; charset=utf-8');
+        $this->output->set_header('Content-Type: text/html');
         $this->load->helper('url');
 
         $doc = new XMLWriter();
