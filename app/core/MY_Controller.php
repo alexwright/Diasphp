@@ -24,16 +24,16 @@ class MY_Controller extends CI_Controller {
             $method = $request_method . '_' . $method;
         }
 
+        if ( ! method_exists($this, $method) )
+        {
+            show_404();
+            return FALSE;
+        }
+
         $r = new ReflectionMethod($this, $method);
         if ($r->isPublic() && !$r->isStatic())
         {
             return call_user_func_array(array($this, $method), $params);
         }
-        
-        header('Content-Type: text/plain');
-        var_dump(array(
-            $method,
-            $params,
-        ));
     }
 }
