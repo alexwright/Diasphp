@@ -36,4 +36,10 @@ class MY_Controller extends CI_Controller {
             return call_user_func_array(array($this, $method), $params);
         }
     }
+
+    protected function view ($template_name, $view_data = array())
+    {
+        $this->load->library('smarty');
+        $this->smarty->view($template_name, $view_data);
+    }
 }
