@@ -14,6 +14,17 @@ class MY_Model extends CI_Model {
         $this->table_name = $table_name;
     }
 
+    protected function update ($changes, $where)
+    {
+        $this->db->update($this->table_name, $changes, $where);
+    }
+
+    protected function insert ($row)
+    {
+        $this->db->insert($this->table_name, $row);
+        return $this->db->insert_id();
+    }
+
     protected function get_where ($where)
     {
         return $this->db->get_where(
