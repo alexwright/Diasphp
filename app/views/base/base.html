@@ -24,8 +24,12 @@
                         <div class="container">
                             <a class="brand" href="/">DiasPHP</a>
                             <ul class="nav pull-right">
-                                <li><a href="#">Login</a></li>
-                                <li><a href="#">Signup</a></li>
+                                {if isset($session) && isset($session.user_id)}
+                                    <li><a href="/login/logout">Logout</a></li>
+                                {else}
+                                    <li><a href="/login">Login</a></li>
+                                    <li><a href="/singup">Signup</a></li>
+                                {/if}
                             </ul>
                         </div>
                     </div>

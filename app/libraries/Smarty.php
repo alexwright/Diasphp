@@ -14,6 +14,7 @@ class CI_Smarty extends Smarty {
         }
 
         $this->setup_plugins();
+        $this->setup_globals();
     }
 
     public function view ($template, $view_data = array(), $return = FALSE)
@@ -38,6 +39,12 @@ class CI_Smarty extends Smarty {
         {
             return $this->fetch($template);
         }
+    }
+
+    private function setup_globals ()
+    {
+        $CI = get_instance();
+        $this->assign('session', $CI->session->all_userdata());
     }
 
     private function setup_plugins ()

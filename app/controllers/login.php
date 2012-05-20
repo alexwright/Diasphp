@@ -64,4 +64,13 @@ class Login extends MY_Controller {
         }
         return $form_data;
     }
+
+    public function logout ()
+    {
+        $this->session->unset_userdata(array(
+            'user_id'       => '',
+            'profile_id'    => '',
+        ));
+        redirect(site_url());
+    }
 }
