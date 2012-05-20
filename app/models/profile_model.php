@@ -76,6 +76,22 @@ class Profile_model extends MY_Model {
         return $id;
     }
 
+    public function create_local_profile ($user_id, $local, $domain, $fname, $sname)
+    {
+        $guid = substr(md5(uniqid()), 0, 16);
+        $row = array(
+            'type'              => 'local',
+            'user_id'           => $user_id,
+            'local'             => $local,
+            'domain'            => $domain,
+            'guid'              => $guid,
+            'forename'          => $fname,
+            'surname'           => $sname,
+        );
+
+        return $this->insert($row);
+    }
+
     private function normalize_key ($key)
     {
         // Strip armor

@@ -1,0 +1,29 @@
+{extends file="base/base.html"}
+{block name="page_main"}
+<div class="row">
+    <form class="form-horizontal span8 offset2" method="POST" action="{site_url('login')}">
+        <fieldset>
+            {if isset($error)}
+                <div class="alert alert-error">
+                    {$error}
+                </div>
+            {/if}
+            <legend>Login</legend>
+            <div class="control-group">
+                <label class="control-label" for="txt-user">Username:</label>
+                <div class="controls">
+                    <input name="user" type="text" id="txt-user" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="txt-pass">Password:</label>
+                <div class="controls">
+                    <input name="pass" type="password" id="txt-pass" />
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+        </fieldset>
+    </form>
+{/block}

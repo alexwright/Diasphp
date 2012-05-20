@@ -1,0 +1,40 @@
+{extends file="base/base.html"}
+{block name="page_main"}
+<div class="row">
+    <form class="form-horizontal span8 offset2" method="POST" action="{site_url('profile/create')}">
+        <fieldset>
+            {if isset($error)}
+                <div class="alert alert-error">
+                    {$error}
+                </div>
+            {/if}
+            <legend>Login</legend>
+            <div class="control-group">
+                <label class="control-label" for="txt-user">URN:</label>
+                <div class="controls">
+                    <input name="local" type="text" id="txt-local" />
+                    <div class="input-prepend input-append">
+                        <span class="add-on">@</span><select name="domain" class="span2">
+                            <option value="dev.diasphp.com">dev.diasphp.com</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="txt-fname">Forename:</label>
+                <div class="controls">
+                    <input name="fname" type="text" id="txt-fname" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="txt-sname">Surname:</label>
+                <div class="controls">
+                    <input name="sname" type="text" id="txt-sname" />
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Create Profile</button>
+            </div>
+        </fieldset>
+    </form>
+{/block}
