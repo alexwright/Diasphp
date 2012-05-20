@@ -24,7 +24,7 @@ class Login extends MY_Controller {
             $this->session->set_userdata(array(
                 'user_id'   => $user->id,
             ));
-            redirect(site_url('profile'));
+            redirect(site_url('home'));
         }
         else
         {
