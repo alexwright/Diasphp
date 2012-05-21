@@ -4,8 +4,8 @@ class Receive extends CI_Controller {
     public function users ($guid)
     {
         $this->load->model('profile_model');
-        $profile = $this->profile_model->find_by_guid($guid);
-        if ($profile === FALSE)
+        $to = $this->profile_model->find_by_guid($guid);
+        if ($to === FALSE)
         {
             $this->output->set_status_header(404);
             return;
@@ -27,13 +27,13 @@ class Receive extends CI_Controller {
         }
 
         $env = $this->get_env($dom);
-        $decrypted_header = $this->decrypt_header($dom, $profile);
+        $decrypted_header = $this->decrypt_header($dom, $to);
         $decrypted_data = $this->decrypt_data($env, $decrypted_header);
 
         $author_id = $decrypted_header['author_id'];
-        $profile = $this->finger($author_id);
+        $author_profile = $this->finger($author_id);
         
-        $legit = $this->verify($env['data'], $env['sig'], $profile->public_key);
+        $legit = $this->verify($env['data'], $env['sig'], $author_profile->public_key);
         if ( ! $legit )
         {
             $this->output->set_status_header(404);
@@ -41,7 +41,7 @@ class Receive extends CI_Controller {
         }
 
         $dom = $this->fix_xml($decrypted_data);
-        if ($this->handle($dom))
+        if ($this->handle($dom, $author_profile, $to))
         {
             $this->output->set_status_header(200);
             echo "ok";
@@ -54,7 +54,7 @@ class Receive extends CI_Controller {
         }
     }
 
-    private function handle ($dom_payload)
+    private function handle ($dom_payload, $signed_by, $sent_to)
     {
         if (
             $dom_payload->firstChild->nodeName != 'XML'
