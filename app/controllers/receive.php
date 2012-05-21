@@ -70,12 +70,36 @@ class Receive extends CI_Controller {
         {
             switch ($c->nodeName)
             {
+                case 'status_message':
+                    $this->handle_status_message($c, $signed_by, $sent_to);
+                    break;
+
                 default:
+                    echo "message: ", $c->nodeName, "\n";
+                    echo $dom_payload->saveXML($c), "\n\n";
                     // unknow message type
                     break;
             }
         }
         return TRUE;
+    }
+
+    private function handle_status_message ($c, $signed_by, $sent_to)
+    {
+        $message = $this->dom_to_assoc($c);
+
+        if ($message['diaspora_handle'] == $signed_by->local . '@' . $signed_by->domain)
+        {
+            $m = (object)$message;
+            $this->load->model('status_message_model');
+            $i = $this->status_message_model->create(
+                    $m->guid, $signed_by->id, $sent_to->id,
+                    $m->public == 'true', $m->created_at, $m->raw_message);
+        }
+        else
+        {
+            // Don't know how to handle this.
+        }
     }
 
     private function fix_xml ($xml)
@@ -199,6 +223,10 @@ class Receive extends CI_Controller {
         else if ($dom instanceof DOMNodeList)
         {
             $node_list = $dom;
+        }
+        else if ($dom instanceof DOMElement)
+        {
+            $node_list = $dom->childNodes;
         }
         else
         {
