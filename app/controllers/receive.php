@@ -198,7 +198,7 @@ class Receive extends CI_Controller {
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = FALSE;
 
-        $xml = str_replace(array(chr(12), chr(3), chr(1)), '', $xml);
+        $xml = str_replace(array(chr(12), chr(3), chr(1), chr(5), chr(8), chr(0x10)), '', $xml);
         $xml = trim($xml);
         $dom->loadXML($xml);
         return $dom;
