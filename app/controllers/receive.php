@@ -74,6 +74,10 @@ class Receive extends CI_Controller {
                     $this->handle_status_message($c, $signed_by, $sent_to);
                     break;
 
+                case 'signed_retraction':
+                    $this->handle_signed_retraction($c, $signed_by, $sent_to);
+                    break;
+
                 default:
                     echo "message: ", $c->nodeName, "\n";
                     echo $dom_payload->saveXML($c), "\n\n";
@@ -99,6 +103,41 @@ class Receive extends CI_Controller {
         else
         {
             // Don't know how to handle this.
+        }
+    }
+
+    private function handle_signed_retraction ($c, $signed_by, $sent_to)
+    {
+        $message = $this->dom_to_assoc($c);
+
+        $base_str = $message['target_guid'] . ';' . $message['target_type'];
+        $my_hash = base64_encode(hash('sha256', $base_str, TRUE));
+        $raw_sig = base64_decode($message['target_author_signature']);
+
+        $public_key = openssl_get_publickey($signed_by->public_key);
+        $decrypted_sig = '';
+        $r = openssl_public_decrypt($raw_sig, $decrypted_sig, $public_key);
+        if ($r !== TRUE)
+        {
+            throw new Exception('public_decrypt() failed');
+            return FALSE;
+        }
+
+        $their_hash = base64_encode(substr($decrypted_sig, - 32));
+        
+        if ($my_hash != $their_hash)
+        {
+            return FALSE;
+        }
+
+        switch ($message['target_type'])
+        {
+            case 'StatusMessage':
+                $this->load->model('status_message_model');
+                $this->status_message_model->delete_by_guid($message['target_guid']);
+                break;
+            default:
+                echo "Unknown retraction type\n";
         }
     }
 
