@@ -191,6 +191,8 @@ class Receive extends CI_Controller {
         }
 
         // Store the comment at this point.
+        $this->load->model('comment_model');
+        $this->comment_model->create($author_profile->id, $message['guid'], $message['parent_guid'], $message['text']);
     }
 
     private function fix_xml ($xml)
