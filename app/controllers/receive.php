@@ -78,6 +78,10 @@ class Receive extends CI_Controller {
                     $this->handle_signed_retraction($c, $signed_by, $sent_to);
                     break;
 
+                case 'comment':
+                    $this->handle_comment($c, $signed_by, $sent_to);
+                    break;
+
                 default:
                     echo "message: ", $c->nodeName, "\n";
                     echo $dom_payload->saveXML($c), "\n\n";
@@ -139,6 +143,54 @@ class Receive extends CI_Controller {
             default:
                 echo "Unknown retraction type\n";
         }
+    }
+
+    private function handle_comment ($c, $signed_by, $sent_to)
+    {
+        $message = $this->dom_to_assoc($c);
+
+        $base_str = $message['guid'] . ';' . $message['parent_guid'] . ';' . 
+                    $message['text'] . ';' . $message['diaspora_handle'];
+        $my_hash = base64_encode(hash('sha256', $base_str, TRUE));
+
+        // Check the author
+        $raw_sig = base64_decode($message['author_signature']);
+        $author_profile = $this->finger($message['diaspora_handle']);
+        $public_key = openssl_get_publickey($author_profile->public_key);
+        $decrypted_sig = '';
+        $r = openssl_public_decrypt($raw_sig, $decrypted_sig, $public_key);
+
+        if ($r !== TRUE)
+        {
+            throw new Exception('public_decrypt() failed');
+            return FALSE;
+        }
+
+        $their_hash = base64_encode(substr($decrypted_sig, - 32));
+        if ($their_hash != $my_hash)
+        {
+            return FALSE;
+        }
+
+        // Check post owner
+        $raw_sig = base64_decode($message['parent_author_signature']);
+        $public_key = openssl_get_publickey($signed_by->public_key);
+        $decrypted_sig = '';
+        $r = openssl_public_decrypt($raw_sig, $decrypted_sig, $public_key);
+
+        if ($r !== TRUE)
+        {
+            throw new Exception('public_decrypt() failed');
+            return FALSE;
+        }
+
+        $their_hash = base64_encode(substr($decrypted_sig, - 32));
+        if ($their_hash != $my_hash)
+        {
+            return FALSE;
+        }
+
+        // Store the comment at this point.
     }
 
     private function fix_xml ($xml)
