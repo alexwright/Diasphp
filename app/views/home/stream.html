@@ -16,6 +16,11 @@
                         <a href="{$photo->url}">{$photo->guid}</a>
                     {/foreach}
                 </div>
+                <div>
+                    {foreach $post->comments AS $comment}
+                        <span class="author">{$comment->profile->forename}</span>: {$comment->text}
+                    {/foreach}
+                </div>
             </div>
         </div>
         <div class="">{$post->guid}</div>
