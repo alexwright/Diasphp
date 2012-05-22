@@ -17,10 +17,12 @@ class Home extends MY_Controller {
 
         $this->load->model('profile_model');
         $this->load->model('comment_model');
+        $this->load->model('photo_model');
         foreach ($stream AS $i => $post)
         {
             $stream[$i]->profile = $this->profile_model->find_by_id($post->from_id);
             $stream[$i]->comments = $this->comment_model->get_by_post_guid($post->guid);
+            $stream[$i]->photos = $this->photo_model->get_by_post_guid($post->guid);
         }
 
         $this->view('home/stream', array(
