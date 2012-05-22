@@ -13,6 +13,11 @@ class Status_message_model extends MY_Model {
         return $this->insert($row);
     }
 
+    public function get_by_guid ($guid)
+    {
+        return $this->row_or_false($this->get_where(array('guid'=> $guid)));
+    }
+
     public function delete_by_guid ($guid)
     {
         return $this->db->delete($this->table_name, array('guid'=> $guid));

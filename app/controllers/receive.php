@@ -82,6 +82,10 @@ class Receive extends CI_Controller {
                     $this->handle_comment($c, $signed_by, $sent_to);
                     break;
 
+                case 'photo':
+                    $this->handle_photo($c, $signed_by, $sent_to);
+                    break;
+
                 default:
                     echo "message: ", $c->nodeName, "\n";
                     echo $dom_payload->saveXML($c), "\n\n";
@@ -193,6 +197,34 @@ class Receive extends CI_Controller {
         // Store the comment at this point.
         $this->load->model('comment_model');
         $this->comment_model->create($author_profile->id, $message['guid'], $message['parent_guid'], $message['text']);
+    }
+
+    private function handle_photo ($c, $signed_by, $sent_to)
+    {
+        $message = $this->dom_to_assoc($c);
+
+        $this->load->model('status_message_model');
+        $post = $this->status_message_model->get_by_guid($message['status_message_guid']);
+        if ( ! $post )
+        {
+            // Not a post we know about
+            return FALSE;
+        }
+
+        if ($post->from_id != $signed_by->id)
+        {
+            // Not the author of the original post
+            return FALSE;
+        }
+
+        // All seems legit.
+        $this->load->model('photo_model');
+        $this->photo_model->create(
+            $message['guid'],
+            $signed_by->id,
+            $message['created_at'],
+            $message['remote_photo_path'] . $message['remote_photo_name'],
+            $post->guid);
     }
 
     private function fix_xml ($xml)
