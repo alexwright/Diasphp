@@ -17,4 +17,9 @@ class Status_message_model extends MY_Model {
     {
         return $this->db->delete($this->table_name, array('guid'=> $guid));
     }
+
+    public function get_stream ($profile_id)
+    {
+        return $this->get_where(array('to_id'=> $profile_id))->result();
+    }
 }

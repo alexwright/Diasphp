@@ -1,0 +1,21 @@
+{extends file="base/main_ui.html"}
+{block name="main_ui_right"}
+    {foreach $stream AS $post}
+        <div class="row">
+            <div class="span2">
+                <span>
+                    {$post->profile->forename}
+                    {$post->profile->surname}
+                </span>
+            </div>
+            <div class="span7">
+                <time datetime="{$post->created}">{$post->created}</time>
+                <p>{$post->message}</p>
+            </div>
+        </div>
+        <div class="">{$post->guid}</div>
+    {foreachelse}
+        <div>Nothing here :(</div>
+    {/foreach}
+    <pre>{foreach $stream AS $post}{var_dump($post)}{/foreach}</pre>
+{/block}

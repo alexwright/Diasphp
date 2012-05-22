@@ -12,6 +12,9 @@ class MY_Controller extends CI_Controller {
         {
             $this->load->model('user_model');
             $this->user = $this->user_model->get_by_id($user_id);
+
+            $this->load->model('profile_model');
+            $this->profile = $this->profile_model->find_by_user_id($user_id);
         }
     }
 

@@ -12,6 +12,13 @@ class Profile_model extends MY_Model {
         )));
     }
 
+    public function find_by_user_id ($user_id)
+    {
+        return $this->row_or_false($this->get_where(array(
+            'user_id'=> $user_id,
+        )));
+    }
+
     public function find_by_email ($email_address)
     {
         list($local, $domain) = explode('@', $email_address, 2);
