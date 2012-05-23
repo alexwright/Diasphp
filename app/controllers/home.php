@@ -1,16 +1,22 @@
 <?php
 class Home extends MY_Controller {
-    public function index ()
+    public function __construct ()
     {
+        parent::__construct();
+
         if ( ! $this->user )
         {
             return redirect('login');
+            exit;
         }
-        
+    }
+
+    public function index ()
+    {
         $this->stream();
     }
 
-    private function stream ()
+    public function stream ()
     {
         $this->load->model('status_message_model');
         $stream = $this->status_message_model->get_stream($this->profile->id);
