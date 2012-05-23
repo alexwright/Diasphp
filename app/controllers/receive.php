@@ -86,6 +86,10 @@ class Receive extends CI_Controller {
                     $this->handle_photo($c, $signed_by, $sent_to);
                     break;
 
+                case 'request':
+                    $this->handle_request($c, $signed_by, $sent_to);
+                    break;
+
                 default:
                     echo "message: ", $c->nodeName, "\n";
                     echo $dom_payload->saveXML($c), "\n\n";
@@ -225,6 +229,14 @@ class Receive extends CI_Controller {
             $message['created_at'],
             $message['remote_photo_path'] . $message['remote_photo_name'],
             $post->guid);
+    }
+
+    private function handle_request ($c, $signed_by, $sent_to)
+    {
+        $message = $this->dom_to_assoc($c);
+
+        $this->load->model('contact_model');
+        $this->contact_model->add($sent_to->id, $signed_by->id, 'Y');
     }
 
     private function fix_xml ($xml)

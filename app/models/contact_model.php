@@ -27,4 +27,35 @@ class Contact_model extends MY_Model {
             ->get()
             ->result();
     }
+
+    public function add ($profile_id, $contact_profile_id, $from = 'N', $to = 'N')
+    {
+        $current = $this->get_where(array(
+            'profile_id'            => $profile_id,
+            'contact_profile_id'    => $contact_profile_id,
+        ))->row();
+
+        if (empty($current))
+        {
+            $row = array(
+                'profile_id'        => $profile_id,
+                'contact_profile_id'=> $contact_profile_id,
+                'to'    => $to,
+                'from'  => $from,
+            );
+            $this->insert($row);
+        }
+        else
+        {
+            $this->update(
+                array(
+                    'to'    => $to == 'Y' ? 'Y' : $current->to,
+                    'from'  => $from == 'Y' ? 'Y' : $current->from,
+                ),
+                array(
+                    'id'    => $current->id,
+                )
+            );
+        }
+    }
 }
