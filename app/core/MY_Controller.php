@@ -20,6 +20,17 @@ class MY_Controller extends CI_Controller {
 
     public function _remap ($method, $params)
     {
+        if (isset($this->requires))
+        {
+            if ($this->requires == 'profile')
+            {
+                if ( ! $this->user OR ! $this->profile )
+                {
+                    return redirect('login');
+                }
+            }
+        }
+
         $request_method = strtolower($this->input->server('REQUEST_METHOD'));
 
         if (method_exists($this, $request_method . '_' . $method))

@@ -1,15 +1,6 @@
 <?php
 class Home extends MY_Controller {
-    public function __construct ()
-    {
-        parent::__construct();
-
-        if ( ! $this->user )
-        {
-            return redirect('login');
-            exit;
-        }
-    }
+    protected $requires = 'profile';
 
     public function index ()
     {
